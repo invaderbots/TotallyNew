@@ -1,0 +1,29 @@
+command syntax
+	
+	main command function
+
+		bot check
+
+		author has perms ?
+
+			check if owner
+
+				bot|user
+
+					parameter check
+
+						do action
+
+		parameters check
+
+		convert types
+
+			bot has perms ?
+
+				author|user
+				bot|user
+
+					do action
+
+
+	command error handler / global command handler

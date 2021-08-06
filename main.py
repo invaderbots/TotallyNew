@@ -36,17 +36,17 @@ async def kick(ctx, member=None, *, reason='No reason provided'):
 		return
 
 	if (ctx.author.permissions_in(ctx.channel).kick_members!=True):
-		await ctx.send(embed=discord.Embed(title='Kick Error',description='You do not have permissions to kick members',color=0xFFFF00))
+		await ctx.send(embed=discord.Embed(description='You do not have permissions to kick members',color=0xFFFF00))
 		return
 
 	if member == None:
-		await ctx.send(embed=discord.Embed(title='Kick Error',description='You need to specify a valid member to kick them',color=0xFFFF00))
+		await ctx.send(embed=discord.Embed(description='You need to specify a valid member to kick them',color=0xFFFF00))
 		return
 	else:
 		try:
 			member = await clientMemberConverter.convert(ctx, member)
 		except commands.MemberNotFound:
-			await ctx.send(embed=discord.Embed(title='Kick Error',description='You need to specifiy a valid member to kick them',color=0xFFFF00))
+			await ctx.send(embed=discord.Embed(description='You need to specifiy a valid member to kick them',color=0xFFFF00))
 			return
 
 	if (ctx.me.permissions_in(ctx.channel).kick_members==True):
@@ -57,12 +57,12 @@ async def kick(ctx, member=None, *, reason='No reason provided'):
 
 				await member.kick(reason=reason)
 
-				kickEmbed = discord.Embed(title='Kick',description=f'{member.mention} was kicked',color=0x00FFFF)
+				kickEmbed = discord.Embed(description=f'{member.mention} was kicked',color=0x00FFFF)
 				kickEmbed.set_footer(text=reason)
 
 			else:
 
-				kickEmbed = discord.Embed(title='Kick Error',description='I cannot kick members with higher authority than mine',color=0xFFFF00)
+				kickEmbed = discord.Embed(description='I cannot kick members with higher authority than mine',color=0xFFFF00)
 
 				await ctx.send(embed=kickEmbed)
 		else:
@@ -72,12 +72,12 @@ async def kick(ctx, member=None, *, reason='No reason provided'):
 				if (ctx.me.top_role > member.top_role):
 
 					await member.kick(reason=reason)
-					kickEmbed = discord.Embed(title='Kick',description=f'{member.mention} was kicked',color=0x00FFFF)
+					kickEmbed = discord.Embed(description=f'{member.mention} was kicked',color=0x00FFFF)
 					kickEmbed.set_footer(text=reason)
 
 				else:
 
-					kickEmbed = discord.Embed(title='Kick',description='I cannot kick members with higher authority than mine',color=0xFFFF00)
+					kickEmbed = discord.Embed(description='I cannot kick members with higher authority than mine',color=0xFFFF00)
 
 				await ctx.send(embed=kickEmbed)
 
@@ -94,17 +94,17 @@ async def ban(ctx, member=None, *, reason='No reason provided'):
 		return
 
 	if (ctx.author.permissions_in(ctx.channel).ban_members!=True):
-		await ctx.send(embed=discord.Embed(title='Ban Error',description='You do not have permissions to ban members',color=0xFFFF00))
+		await ctx.send(embed=discord.Embed(description='You do not have permissions to ban members',color=0xFFFF00))
 		return
 
 	if member == None:
-		await ctx.send(embed=discord.Embed(title='Ban Error',description='You need to specify a valid member to ban them',color=0xFFFF00))
+		await ctx.send(embed=discord.Embed(description='You need to specify a valid member to ban them',color=0xFFFF00))
 		return
 	else:
 		try:
 			member = await clientMemberConverter.convert(ctx, member)
 		except commands.MemberNotFound:
-			await ctx.send(embed=discord.Embed(title='Ban Error',description='You need to specifiy a valid member to ban them',color=0xFFFF00))
+			await ctx.send(embed=discord.Embed(description='You need to specifiy a valid member to ban them',color=0xFFFF00))
 			return
 
 	if (ctx.me.permissions_in(ctx.channel).ban_members==True):
@@ -115,12 +115,12 @@ async def ban(ctx, member=None, *, reason='No reason provided'):
 
 				await member.ban(reason=reason)
 
-				banEmbed = discord.Embed(title='Ban',description=f'{member.mention} was banned',color=0x00FFFF)
+				banEmbed = discord.Embed(description=f'{member.mention} was banned',color=0x00FFFF)
 				banEmbed.set_footer(text=reason)
 
 			else:
 
-				banEmbed = discord.Embed(title='Ban Error',description='I cannot ban members with higher authority than mine',color=0xFFFF00)
+				banEmbed = discord.Embed(description='I cannot ban members with higher authority than mine',color=0xFFFF00)
 
 				await ctx.send(embed=banEmbed)
 		else:
@@ -130,24 +130,63 @@ async def ban(ctx, member=None, *, reason='No reason provided'):
 				if (ctx.me.top_role > member.top_role):
 
 					await member.ban(reason=reason)
-					banEmbed = discord.Embed(title='Ban',description=f'{member.mention} was banned',color=0x00FFFF)
+					banEmbed = discord.Embed(description=f'{member.mention} was banned',color=0x00FFFF)
 					banEmbed.set_footer(text=reason)
 
 				else:
 
-					banEmbed = discord.Embed(title='Ban Error',description='I cannot ban members with higher authority than mine',color=0xFFFF00)
+					banEmbed = discord.Embed(description='I cannot ban members with higher authority than mine',color=0xFFFF00)
 
 				await ctx.send(embed=banEmbed)
+
+@client.event
+async def on_message(message):
+	await client.process_commands(message)
 
 @client.event
 async def on_command_error(ctx, error):
 	if isinstance(ctx, commands.CommandInvokeError):
 		error = error.original
-	await ctx.send(
+	if isinstance(ctx. commands.CommandNotFound):
+		return
+	await ctx.send(embed=discord.Embed(
 		title = 'Error',
-		description = error.capitalize(),
+		description = f'{error}'.capitalize(),
 		color = 0xFF0000
-	)
+	))
+
+
+client.remove_command('help')
+
+@client.command(
+	name = 'help',
+	description = 'Displays all available commands',
+	usage = f'{client.command_prefix}help <command>',
+	aliases = [])
+async def help(ctx, command=None):
+	if command != None:
+		command = command.lower()
+		for commando in client.commands:
+			if commando.name.lower() == command:
+
+				if not commando.aliases:
+					aliasES = '`None`'
+				else:
+					aliasES = ''
+					for element in commando.aliases:
+						aliasES += f'`{element}` '
+
+				helpEmbed = discord.Embed(title=f'{commando.name.capitalize()} - Help',
+					description = f'{commando.description}\n\nAliases {aliasES}\n\nUsage `{commando.usage}`', color = discord.Color.random())
+				helpEmbed.set_footer(text=f'[] - Required Field, <> - Optional Field')
+				await ctx.send(embed=helpEmbed)
+				return
+			else:
+				pass
+		await ctx.send(embed=discord.Embed(title='Help',description=f'\'{command}\' does not exist',color=0xFFFF00))
+		return
+	else:
+		await ctx.send('hahahahha nub')
 
 
 client.run(config.get('TOKEN'))
